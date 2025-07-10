@@ -1,240 +1,98 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>RahatMovies - উন্নত মডেল</title>
-<style>
-  /* রেসপন্সিভ বেসিক স্টাইল */
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #121212;
-    color: #eee;
-    margin: 0;
-    padding: 0 15px;
-  }
-  header {
-    padding: 15px 0;
-    text-align: center;
-    background: #1f1f1f;
-    font-size: 1.8rem;
-    font-weight: bold;
-    letter-spacing: 1px;
-  }
-  .controls {
-    margin: 20px 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: center;
-  }
-  .controls input[type="text"],
-  .controls select {
-    padding: 8px 12px;
-    font-size: 1rem;
-    border-radius: 5px;
-    border: none;
-    min-width: 180px;
-  }
-  .movie-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit,minmax(250px,1fr));
-    gap: 15px;
-    margin-bottom: 40px;
-  }
-  .movie-card {
-    background: #222;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 0 10px #000000aa;
-    display: flex;
-    flex-direction: column;
-  }
-  .movie-poster {
-    width: 100%;
-    height: 350px;
-    object-fit: cover;
-  }
-  .movie-info {
-    padding: 12px;
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-  }
-  .movie-title {
-    font-size: 1.2rem;
-    margin-bottom: 6px;
-    font-weight: 600;
-  }
-  .movie-category {
-    font-size: 0.9rem;
-    color: #aaa;
-    margin-bottom: 10px;
-  }
-  /* স্টার রেটিং স্টাইল */
-  .rating {
-    display: flex;
-    gap: 3px;
-    cursor: pointer;
-  }
-  .rating span {
-    font-size: 1.5rem;
-    color: #444;
-    transition: color 0.2s ease-in-out;
-  }
-  .rating span.filled {
-    color: gold;
-  }
-
-  @media(max-width: 600px) {
-    header {
-      font-size: 1.4rem;
+  <meta charset="UTF-8">
+  <title>Auto Movie Download</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background: #111;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
     }
-    .movie-poster {
-      height: 220px;
+    h1 {
+      text-align: center;
     }
-  }
-</style>
+    .movie-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 20px;
+      padding: 10px;
+    }
+    .movie-card {
+      background: #222;
+      border-radius: 10px;
+      padding: 10px;
+      text-align: center;
+    }
+    .movie-card img {
+      width: 100%;
+      height: 270px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    .movie-title {
+      font-size: 1rem;
+      margin: 10px 0 5px;
+    }
+    .rating {
+      font-size: 0.9rem;
+      color: #f9c74f;
+    }
+    .download-btn {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 6px 12px;
+      background: #28a745;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+    .download-btn:hover {
+      background: #218838;
+    }
+  </style>
 </head>
 <body>
 
-<header>RahatMovies উন্নত মডেল</header>
+  <h1>🎬 Auto Movie Download</h1>
+  <div class="movie-grid" id="movieContainer">
+    <!-- Movies will be loaded here -->
+  </div>
 
-<div class="controls">
-  <input type="text" id="searchBox" placeholder="মুভি অনুসন্ধান করুন..." />
-  <select id="categoryFilter">
-    <option value="all">সব ক্যাটাগরি</option>
-  </select>
-</div>
-
-<div class="movie-list" id="movieList"></div>
-
-<script>
-  // মুভি ডাটা (নমুনা)
-  const movies = [
-    {
-      id: 1,
-      title: "অ্যাভেঞ্জার্স: এন্ডগেম",
-      category: "অ্যাকশন",
-      poster: "https://i.imgur.com/3C9f5fC.jpg",
-      rating: 0
-    },
-    {
-      id: 2,
-      title: "ইনসেপশন",
-      category: "সাই-ফাই",
-      poster: "https://i.imgur.com/O3DG5A7.jpg",
-      rating: 0
-    },
-    {
-      id: 3,
-      title: "দ্য শশাঙ্ক রিডেম্পশন",
-      category: "ড্রামা",
-      poster: "https://i.imgur.com/SuW2ZlC.jpg",
-      rating: 0
-    },
-    {
-      id: 4,
-      title: "ইন্টারস্টেলার",
-      category: "সাই-ফাই",
-      poster: "https://i.imgur.com/nEuVzS2.jpg",
-      rating: 0
-    },
-    {
-      id: 5,
-      title: "জুমাঙ্কি",
-      category: "অ্যাকশন",
-      poster: "https://i.imgur.com/tk9F9Kx.jpg",
-      rating: 0
-    },
-    {
-      id: 6,
-      title: "দ্য গডফাদার",
-      category: "ড্রামা",
-      poster: "https://i.imgur.com/Uzvny9I.jpg",
-      rating: 0
-    }
-  ];
-
-  const movieListEl = document.getElementById('movieList');
-  const searchBox = document.getElementById('searchBox');
-  const categoryFilter = document.getElementById('categoryFilter');
-
-  // ইউনিক ক্যাটাগরি বের করা
-  const categories = ["all", ...new Set(movies.map(m => m.category))];
-  // ক্যাটাগরি ড্রপডাউনে যোগ করা
-  categories.forEach(cat => {
-    const option = document.createElement('option');
-    option.value = cat;
-    option.textContent = cat === 'all' ? 'সব ক্যাটাগরি' : cat;
-    categoryFilter.appendChild(option);
-  });
-
-  function renderMovies(filter = {}) {
-    const {searchTerm = "", category = "all"} = filter;
-    movieListEl.innerHTML = "";
-
-    const filtered = movies.filter(m => {
-      const matchesSearch = m.title.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCategory = category === "all" || m.category === category;
-      return matchesSearch && matchesCategory;
-    });
-
-    filtered.forEach(movie => {
-      const card = document.createElement('div');
-      card.className = "movie-card";
-
-      card.innerHTML = `
-        <img class="movie-poster" src="${movie.poster}" alt="${movie.title}" />
-        <div class="movie-info">
-          <div class="movie-title">${movie.title}</div>
-          <div class="movie-category">${movie.category}</div>
-          <div class="rating" data-id="${movie.id}">
-            ${[1,2,3,4,5].map(i => `<span data-star="${i}">&#9733;</span>`).join('')}
-          </div>
-        </div>
-      `;
-
-      movieListEl.appendChild(card);
-
-      // রেটিং আপডেট
-      const ratingEl = card.querySelector('.rating');
-      updateStars(ratingEl, movie.rating);
-
-      ratingEl.addEventListener('click', e => {
-        if (e.target.tagName === 'SPAN') {
-          const starValue = parseInt(e.target.getAttribute('data-star'));
-          movie.rating = starValue;
-          updateStars(ratingEl, starValue);
-        }
-      });
-    });
-  }
-
-  function updateStars(ratingEl, rating) {
-    [...ratingEl.children].forEach(star => {
-      const starValue = parseInt(star.getAttribute('data-star'));
-      if (starValue <= rating) {
-        star.classList.add('filled');
-      } else {
-        star.classList.remove('filled');
+  <script>
+    const movies = [
+      {
+        title: "Extraction 2 (2023)",
+        poster: "https://image.tmdb.org/t/p/w500/7gKI9hpEMcZUQpNgKrkDzJpbnNS.jpg",
+        rating: "IMDb: 7.1",
+        download: "https://neodrive.xyz/f/b6e5817d"
+      },
+      {
+        title: "John Wick: Chapter 4",
+        poster: "https://image.tmdb.org/t/p/w500/vZloFAK7NmvMGKE7VkF5UHaz0I.jpg",
+        rating: "IMDb: 8.2",
+        download: "https://neodrive.xyz/f/abc12345"
       }
+      // আরও মুভি অ্যাড করতে চান? নিচে নতুন movie object অ্যাড করুন
+    ];
+
+    const container = document.getElementById("movieContainer");
+
+    movies.forEach(movie => {
+      const card = document.createElement("div");
+      card.className = "movie-card";
+      card.innerHTML = `
+        <img src="${movie.poster}" alt="${movie.title}">
+        <div class="movie-title">${movie.title}</div>
+        <div class="rating">${movie.rating}</div>
+        <a class="download-btn" href="${movie.download}" target="_blank">Download</a>
+      `;
+      container.appendChild(card);
     });
-  }
-
-  // সার্চ ও ক্যাটাগরি পরিবর্তন ইভেন্ট
-  searchBox.addEventListener('input', () => {
-    renderMovies({searchTerm: searchBox.value, category: categoryFilter.value});
-  });
-  categoryFilter.addEventListener('change', () => {
-    renderMovies({searchTerm: searchBox.value, category: categoryFilter.value});
-  });
-
-  // প্রথম রেন্ডার
-  renderMovies();
-
-</script>
+  </script>
 
 </body>
 </html>
-Add improved model with rating, search & category
